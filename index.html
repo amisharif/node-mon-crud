@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <h4>I have a mongo database </h4>
+
+    <form action="/addProduct" method="post">
+        <input type="text" name="name" placeholder="Name" id="">
+        <input type="text" name="price" placeholder="price" id="">
+        <input type="text" name="quantity" placeholder="Quantity" id="">
+        <button type="submit">Add product</button>
+
+    </form>
+
+    <div id="products">
+
+    </div>
+    <div id="update">
+
+    </div>
+
+
+    <script>
+        function loadProducts() {
+            fetch('/products')
+                .then(res => res.json())
+                .then(products => {
+                    //   console.log(products)
+                    const container = document.getElementById('products');
+                    products.forEach(pd => {
+                        const p = document.createElement('p');
+                        p.innerHTML = `Name: ${pd.name} price: ${pd.price} quantity: ${pd.quantity} 
+
+                        <button onclick="UpdateProduct('${pd._id}')">Update</button>
+
+                        <button onclick="deleteProduct(event,'${pd._id}')">delete</button>`;
+
+                        container.appendChild(p);
+
+                    });
+
+
+                })
+        }
+        loadProducts();
+
+        const UpdateProduct = (id) => {
+            fetch(`/product/${id}`)
+                .then(res => res.json())
+                .then(result => {
+                    const update = document.getElementById('update');
+                    update.innerHTML = `
+                    <h4>Update: ${result._id} </h3> </br> price: <input id="price" type="text" value="${result.price}"/>
+                    <button>Submit</button>`
+                })
+        }
+
+        const deleteProduct = (event, id) => {
+
+            fetch(`/delete/${id}`, {
+                method: 'DELETE'
+            })
+                .then(res => res.json())
+                .then(result => {
+                    console.log('deleted successfully');
+                    if (result) {
+                        event.target.parentNode.style.display = "none";
+                    }
+
+                })
+
+        }
+
+    </script>
+
+</body>
+
+</html>
